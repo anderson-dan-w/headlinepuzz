@@ -14,6 +14,35 @@ WORDS = set()
 
 
 ##############################################################################
+class Word(object):
+    def __init__(self, string, mapping=None, quick=None):
+        self.real_word = string.upper()
+        self.word = "".join(l for l in self.real_word if l.isalpha())
+        self.pattern = get_pattern(self.word)
+        self.mapping = collections.defaultdict(lambda: "?")
+        if mapping is not None:
+            self.mapping.update(mapping)
+        if quick is None:
+            self.set_possibles()
+    
+    def get_plain(self):
+        return "".join(self.mapping[l] for l in self.word)
+
+    def update_mapping(self, mapping):
+        self.mapping.update(mapping)
+        return
+
+    def set_possibles(self, mapping=None):
+        if mapping is None:
+            mapping = self.mapping
+        self.possibles = find_words(self.word, self.pattern, mapping)
+        return
+
+    def is_fully_set(self):
+        return not "?" in self.get_plain()
+
+
+##############################################################################
 def get_pattern(word):
     word = word.upper()
     letters = collections.defaultdict(list)
