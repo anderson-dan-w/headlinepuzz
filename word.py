@@ -47,7 +47,6 @@ class Word(object):
 def get_pattern(word):
     word = word.upper()
     letters = collections.defaultdict(list)
-    letters.update
     for idx, lett in enumerate(word):
         letters[lett].append(idx)
     first = min([val[0] for val in letters.values() if len(val) > 1] + [100])
@@ -83,7 +82,7 @@ def find_words(word, pattern=None, preset=None):
         answers.add(potential)
     return answers
 
-##################################
+##############################################################################
 def save_pattern_file():
     hlpdir = os.getenv("HOME") + "/.hlp/"
     if os.path.exists(hlpdir + "patterns.txt"):
@@ -123,11 +122,9 @@ def readin_dict(word_len=None, words=WORDS, patterns=PATTERNS, texts=TEXTS):
     return True
 
 ##############################################################################
-@dwanderson.time_me
 def not_main():
     readin_pattern_file() or readin_dict()
 
-@dwanderson.time_me
 def main():
     if len(sys.argv) != 2:
         print("USAGE: Provide 1 argument, the word")

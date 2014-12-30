@@ -5,7 +5,7 @@ import collections
 
 ## dwanderson modules
 import dwanderson
-import HLPWord as W
+import word as W
 
 ALPHABET = W.ALPHABET
 
@@ -84,3 +84,7 @@ class Headline(object):
         if update:
             self.update_possibles()
         return
+
+    ##======================================================================##
+    def get_score(self):
+        pass
