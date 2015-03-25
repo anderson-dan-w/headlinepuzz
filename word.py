@@ -1,16 +1,14 @@
 #!/usr/bin/python3
-from __future__ import print_function, division
-
-# python modules
 import collections
 import os
 import sys
+import json
+import string
 
-# dwanderson modules
-import dwanderson
-
-ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-TEXTS = dwanderson.texts
+text_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "texts")
+TEXTS = {os.path.join(text_dir, fname) for fname in os.listdir(text_dir)
+                if fname.endswith(".dict")}
+ALPHABET = string.ascii_uppercase
 PATTERNS = collections.defaultdict(list)
 WORDS = set()
 
@@ -84,41 +82,38 @@ def find_words(word, pattern=None, preset=None):
 
 ##############################################################################
 def save_pattern_file():
-    hlpdir = os.getenv("HOME") + "/.hlp/"
-    if os.path.exists(hlpdir + "patterns.txt"):
+    hlpdir = os.path.join(os.getenv("HOME"), ".hlp")
+    pattern_fname = os.path.join(hlpdir, "patterns.txt")
+    if os.path.exists(pattern_fname):
         return
     if not os.path.exists(hlpdir):
         os.mkdir(hlpdir)
-    with open(hlpdir + "patterns.txt", "w") as fh:
-        for k, v in sorted(PATTERNS.items()):
-            print("{} {}".format(k, " ".join(v)), file=fh)
-        print("done making {}".format(hlpdir+"patterns.txt"))
+    json.dump(PATTERNS, open(pattern_fname, "w"), indent=4)
+    print("done making {}".format(pattern_fname))
     return
 
 def readin_pattern_file(filename=None, patterns=PATTERNS, words=WORDS):
     if filename is None:
-        filename = os.getenv("HOME") + "/.hlp/patterns.txt"
+        filename = os.path.join(os.getenv("HOME"), ".hlp", "patterns.txt")
     if not os.path.exists(filename):
         print("File doesn't seem to exist")
         return False
-    with open(filename) as fh:
-        lines = [l.strip() for l in fh.readlines()]
-    for line in lines:
-        terms = line.split()
-        pattern, pattern_words = terms[0], terms[1:]
-        patterns[pattern].extend(pattern_words)
-        words.update(pattern_words)
+    patterns.update(json.load(open(filename)))
+    for word_list in patterns.values():
+        words.update(word_list)
     return True
 
 def readin_dict(word_len=None, words=WORDS, patterns=PATTERNS, texts=TEXTS):
     for fname in texts:
         with open(fname) as fh:
             text = str(fh.read()).replace("\r","").upper()
-            word_list = [w for w in text.split("\n") if w.isalpha() and
-                                (len(w) == word_len or word_len is None)]
+            word_list = {w for w in text.split("\n") if w.isalpha() and
+                                (len(w) == word_len or word_len is None)}
             words.update(word_list)
     for word in words:
         patterns[get_pattern(word)].append(word)
+    if word_len == None:
+        save_pattern_file()
     return True
 
 ##############################################################################
@@ -131,7 +126,7 @@ def main():
         return
     word = sys.argv[1].upper()
     readin_pattern_file() or readin_dict(len(word))
-    dwanderson.print_list(find_words(word))
+    print(sorted(find_words(word)))
     return
 
 if __name__ == '__main__':
