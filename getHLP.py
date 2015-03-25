@@ -1,4 +1,4 @@
-#!/usr/local/lib/python3
+#!/usr/bin/python3
 from http.client import HTTPConnection
 import re
 
@@ -14,12 +14,16 @@ def getHLP():
     text = get_webpage("thephoenixsociety.org", "/puzzles/puzzles.htm")
     match = re.search("address shown above.*?</p>", text)
     if match:
-        hls_string, n = re.subn("\\\\\w", "", match.group()) ## fix formatting
-        hls = hls_string.split("<br>")[2:]  ## get rid of address, and nbsp
-        hls = [hl[3:] for hl in hls]  ## delete leading number: '1. ', etc
-        hls[-1] = hls[-1].replace("&nbsp;</p>","")
-        return hls
-    print("no match...")
+        headline_string, n = re.subn(r"\\\w", "", match.group())
+        lines = re.split("<br>\d\.\s", headline_string)
+        headlines = lines[1:]  ## first part is 'address shown...'
+        headlines = [h.replace("</p>","").replace("\\","") for h in headlines]
+        return headlines
     return
 
-
+if __name__ == '__main__':
+    headlines = getHLP()
+    if headlines:
+        print(headlines)
+    else:
+        print("Had trouble parsing...")
