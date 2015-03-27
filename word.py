@@ -106,26 +106,34 @@ class Word():
         self.mapping = collections.defaultdict(lambda: self.DIT)
         if mapping is not None:
             self.mapping.update(mapping)
-        self.possibles = set()
+        self._dirtyMap = True
+        self._possibles = set()
         if quick is None:
-            self.set_possibles()
-    
-    def get_plain(self):
+            self.possibles
+            self._dirtyMap = False
+
+    @property
+    def plain(self):
         return "".join(self.mapping[l] for l in self.word)
 
     def update_mapping(self, mapping):
         self.mapping.update(mapping)
-        return
+        self._dirtyMap = True
 
-    def set_possibles(self, mapping=None):
-        if mapping is None:
-            mapping = self.mapping
-        self.possibles = self.PATTERN_MAPPER.find_words(self.word, self.pattern,
-                                                        mapping)
-        return
+    def clear_mapping(self):
+        self.mapping.clear()
 
+    @property
+    def possibles(self):
+        if self._dirtyMap:
+            self._possibles = self.PATTERN_MAPPER.find_words(self.word,
+                                self.pattern, self.mapping)
+            self._dirtyMap = False
+        return self._possibles
+
+    @property
     def is_fully_set(self):
-        return not self.DIT in self.get_plain()
+        return not self.DIT in self.plain
 
 ##############################################################################
 if __name__ == '__main__':
