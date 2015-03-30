@@ -103,33 +103,18 @@ class Word():
         self.original_word = letters.upper()
         self.word = "".join(l for l in self.original_word if l.isalpha())
         self.pattern = self.PATTERN_MAPPER.get_pattern(self.word)
-        self.mapping = collections.defaultdict(lambda: self.DIT)
-        if mapping is not None:
-            self.mapping.update(mapping)
-        self._dirtyMap = True
-        self._possibles = set()
-        if quick is None:
-            self.possibles
-            self._dirtyMap = False
+        self.mapping = mapping
+        if self.mapping is None:
+            self.mapping = collections.defaultdict(lambda: self.DIT)
 
     @property
     def plain(self):
         return "".join(self.mapping[l] for l in self.word)
 
-    def update_mapping(self, mapping):
-        self.mapping.update(mapping)
-        self._dirtyMap = True
-
-    def clear_mapping(self):
-        self.mapping.clear()
-
     @property
     def possibles(self):
-        if self._dirtyMap:
-            self._possibles = self.PATTERN_MAPPER.find_words(self.word,
-                                self.pattern, self.mapping)
-            self._dirtyMap = False
-        return self._possibles
+        return self.PATTERN_MAPPER.find_words(self.word, self.pattern,
+                                              self.mapping)
 
     @property
     def is_fully_set(self):
