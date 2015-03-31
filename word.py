@@ -95,7 +95,7 @@ class PatternMapper():
 PATTERN_MAPPER = PatternMapper()
 
 ##############################################################################
-class Word():
+class Word(object):
     PATTERN_MAPPER = PATTERN_MAPPER
     DIT = PATTERN_MAPPER.DIT
 
@@ -110,6 +110,10 @@ class Word():
     @property
     def plain(self):
         return "".join(self.mapping[l] for l in self.word)
+
+    @plain.setter
+    def plain(self, plainword):
+        self.mapping.update(dict(zip(self.word, plainword)))
 
     @property
     def possibles(self):
