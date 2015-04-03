@@ -112,6 +112,9 @@ class Word(object):
 
     @plain.setter
     def plain(self, plainword):
+        if plainword == "":
+            for letter in self.word:
+                self.mapping.pop(letter, None)
         self.mapping.update(dict(zip(self.word, plainword)))
 
     @property
