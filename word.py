@@ -5,9 +5,7 @@ import sys
 import json
 import string
 
-text_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "texts")
-TEXTS = {os.path.join(text_dir, fname) for fname in os.listdir(text_dir)
-                if fname.endswith(".dict")}
+from .hlpConstants import HLPDIR, DICT_FNAMES, PATTERNS_FNAME
 
 class PatternMapper():
     ALPHABET = string.ascii_uppercase
@@ -55,41 +53,42 @@ class PatternMapper():
         return answers
 
     ##########################################################################
-    def save_pattern_file(self):
-        hlpdir = os.path.join(os.getenv("HOME"), ".hlp")
-        pattern_fname = os.path.join(hlpdir, "patterns.txt")
-        if os.path.exists(pattern_fname):
+    def save_pattern_file(self, fname=None, fdir=None):
+        if fdir is None:
+            fdir = HLPDIR
+        if fname is None:
+            fname = PATTERNS_FNAME
+        full_fname = os.path.join(fdir, fname)
+        if os.path.exists(full_fname):
             return
-        if not os.path.exists(hlpdir):
-            os.mkdir(hlpdir)
-        json.dump(self.patterns, open(pattern_fname, "w"), indent=4)
-        print("done writing {}".format(pattern_fname))
-        return
+        if not os.path.exists(fdir):
+            os.mkdir(fdir)
+        with open(full_fname, "w") as fh:
+            json.dump(self.patterns, fh, indent=4, sort_keys=True)
+        print("done writing {}".format(full_fname))
 
-    def readin_pattern_file(self, filename=None):
-        if filename is None:
-            filename = os.path.join(os.getenv("HOME"), ".hlp", "patterns.txt")
-        if not os.path.exists(filename):
-            print("{} doesn't seem to exist".format(filename))
+    def readin_pattern_file(self, fname=None):
+        if fname is None:
+            fname = os.path.join(HLPDIR, PATTERNS_FNAME)
+        if not os.path.exists(fname):
+            print("{} doesn't seem to exist".format(fname))
             return False
-        self.patterns.update(json.load(open(filename)))
+        with open(fname) as fh:
+            self.patterns.update(json.load(fh))
         for word_list in self.patterns.values():
             self.words.update(word_list)
         return True
 
-    def readin_dict(self, word_len=None, dict_fnames=None):
+    def readin_dict(self, dict_fnames=None):
         if dict_fnames is None:
-            dict_fnames = TEXTS
+            dict_fnames = DICT_FNAMES
         for fname in dict_fnames:
             with open(fname) as fh:
                 text = str(fh.read()).replace("\r","").upper()
-                word_list = {w for w in text.split("\n") if w.isalpha() and
-                                    (len(w) == word_len or word_len is None)}
+                word_list = {w for w in text.split("\n") if w.isalpha()}
                 self.words.update(word_list)
         for word in self.words:
-            self.patterns[get_pattern(word)].append(word)
-        if word_len == None:
-            self.save_pattern_file()
+            self.patterns[self.get_pattern(word)].add(word)
         return True
 ## want a singleton-esque pattern-mapper
 PATTERN_MAPPER = PatternMapper()
