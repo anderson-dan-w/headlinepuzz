@@ -98,7 +98,7 @@ class Word(object):
     PATTERN_MAPPER = PATTERN_MAPPER
     DIT = PATTERN_MAPPER.DIT
 
-    def __init__(self, letters, mapping=None, quick=None):
+    def __init__(self, letters, mapping=None):
         self.original_word = letters.upper()
         self.word = "".join(l for l in self.original_word if l.isalpha())
         self.pattern = self.PATTERN_MAPPER.get_pattern(self.word)
