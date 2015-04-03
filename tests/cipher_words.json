@@ -1,0 +1,53 @@
+{
+    "DOGS": {
+        "mapping": {
+            "all": {
+                "D": "F"
+            },
+            "one": {
+                "D": "F"
+            },
+            "none": {
+                "F": "F"
+            }
+        },
+        "pattern": "ABCD:0:0",
+        "words": [
+            "FISH"
+        ]
+    },
+    "PUPPO": {
+        "mapping": {
+            "all": {
+                "U": "A"
+            },
+            "one": {
+                "P": "S"
+            },
+            "none": {
+                "P": "G"
+            }
+        },
+        "pattern": "ABAA:0:1",
+        "words": [
+            "SASSY", "NANNY"
+        ]
+    },
+    "CHEET": {
+        "mapping": {
+            "all": {
+                "C": "H"
+            },
+            "one": {
+                "H": "A"
+            },
+            "none": {
+                "E": "X"
+            }
+        },
+        "pattern": "AA:2:1",
+        "words": [
+            "HIPPO", "HAPPY"
+        ]
+    }
+}
