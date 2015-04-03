@@ -1,5 +1,6 @@
 [run]
 branch = True
+omit = *json*
 
 [report]
 exclude_lines =
