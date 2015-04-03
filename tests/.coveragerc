@@ -1,0 +1,11 @@
+[run]
+branch = True
+
+[report]
+exclude_lines =
+
+    ## re-enable standard pragme
+    pragma: no cover
+
+    ## ignore __name__ since not runnabel
+    if __name__ == .__main__.:
