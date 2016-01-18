@@ -6,10 +6,11 @@ import json
 import string
 
 from .hlpConstants import HLPDIR, DICT_FNAMES, PATTERNS_FNAME
+from .alphabetSubstitution import ALPHABET, DIT, AlphabetSubstitution
 
 class PatternMapper():
-    ALPHABET = string.ascii_uppercase
-    DIT = "?"
+    ALPHABET = ALPHABET
+    DIT = DIT
 
     def __init__(self, pattern_fname=None, dict_fnames=None):
         self.patterns = collections.defaultdict(set)
@@ -39,9 +40,8 @@ class PatternMapper():
     def find_words(self, word, pattern=None, mapping=None):
         if pattern is None:
             pattern = self.get_pattern(word)
-        preset = collections.defaultdict(lambda:self.DIT)
-        if mapping is not None:
-            preset.update(mapping)
+        mapping = mapping if mapping is not None else {}
+        preset = AlphabetSubstitution(mapping)
         preset_values = set(preset.values())
         answers = set()
         for potential in self.patterns[pattern]:
@@ -102,9 +102,11 @@ class Word(object):
         self.original_word = letters.upper()
         self.word = "".join(l for l in self.original_word if l.isalpha())
         self.pattern = self.PATTERN_MAPPER.get_pattern(self.word)
-        self.mapping = mapping
-        if self.mapping is None:
-            self.mapping = collections.defaultdict(lambda: self.DIT)
+        if isinstance(mapping, AlphabetSubstitution):
+            self.mapping = mapping
+        else:
+            mapping = mapping if mapping is not None else {}
+            self.mapping = AlphabetSubstitution(mapping)
 
     @property
     def plain(self):
