@@ -1,18 +1,21 @@
 #!/usr/bin/python3
 import os
+import sys
 import json
 import unittest
 
-from .. import word as hlpword
-
 HERE = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(HERE))))
+from headlinepuzz import word as hlpword
 
-class PatternMapperTestCase(unittest.TestCase):
+DATA_DIR = os.path.join(HERE, "..", "data")
+
+class TestPatternMapper(unittest.TestCase):
     def setUp(self):
-        self.pattern_fname = os.path.join(HERE, "patterns.json")
-        self.dict_fnames = [os.path.join(HERE, "words.dict"),
-                            os.path.join(HERE, "more_words.dict")]
-        self.cipher_fname = os.path.join(HERE, "cipher_words.json")
+        self.pattern_fname = os.path.join(DATA_DIR, "patterns.json")
+        self.dict_fnames = [os.path.join(DATA_DIR, "words.dict"),
+                            os.path.join(DATA_DIR, "more_words.dict")]
+        self.cipher_fname = os.path.join(DATA_DIR, "cipher_words.json")
         with open(self.pattern_fname) as fh:
             self.expected_patterns = json.load(fh)
         self.expected_words = {word for words in self.expected_patterns.values()
@@ -42,18 +45,18 @@ class PatternMapperTestCase(unittest.TestCase):
     def test_save_pattern_file(self):
         test_fname = "test_save.json"
         try:
-            self.pm.save_pattern_file(test_fname, HERE)
+            self.pm.save_pattern_file(test_fname, DATA_DIR)
             ## strip newlines because json.dump() has noeol at eof
             ## but manually created files implicitly do
-            with open(os.path.join(HERE, self.pattern_fname)) as fh:
+            with open(os.path.join(DATA_DIR, self.pattern_fname)) as fh:
                 expected_text = fh.read().replace("\n","")
-            with open(os.path.join(HERE, test_fname)) as fh:
+            with open(os.path.join(DATA_DIR, test_fname)) as fh:
                 text = fh.read().replace("\n","")
             self.assertEqual(expected_text, text,
                     "expected {}; got {}".format(expected_text, text))
         finally:
-            if os.path.exists(os.path.join(HERE, test_fname)):
-                os.remove(os.path.join(HERE, test_fname))
+            if os.path.exists(os.path.join(DATA_DIR, test_fname)):
+                os.remove(os.path.join(DATA_DIR, test_fname))
 
     def test_get_pattern(self):
         for word in self.expected_words:
@@ -80,11 +83,11 @@ class PatternMapperTestCase(unittest.TestCase):
                 self.assertEqual(count, len(words),
                         "expected {} words; got {}".format(count, len(words)))
 
-class WordTestCase(unittest.TestCase):
+class TestWord(unittest.TestCase):
     ''' Tests for headlinepuzz.word '''
     def setUp(self):
-        self.pattern_fname = os.path.join(HERE, "patterns.json")
-        self.cipher_fname = os.path.join(HERE, "cipher_words.json")
+        self.pattern_fname = os.path.join(DATA_DIR, "patterns.json")
+        self.cipher_fname = os.path.join(DATA_DIR, "cipher_words.json")
         with open(self.cipher_fname) as fh:
             self.cipher_words = json.load(fh)
         ## json doesn't like python sets; override it
