@@ -10,14 +10,23 @@ def get_webpage(domain, url):
     response = conn.getresponse()
     return str(response.read())
 
-def getHLP():
-    text = get_webpage("thephoenixsociety.org", "/puzzles/puzzles.htm")
-    match = re.search("address shown above.*?</p>", text)
+HLP_DOMAIN = "thephoenixsociety.org"
+HLP_URL = "/puzzles/puzzles.htm"
+HLP_DATE_URL = "/puzzles/{0}/{0}_{1:02d}_puzzlesolve.htm"
+
+def getHLP(year_month=None):
+    url = HLP_URL
+    if year_month is not None:
+        year, month = year_month
+        url = HLP_DATE_URL.format(year, month)
+    text = get_webpage(HLP_DOMAIN, url)
+    match = re.search("above.*?</p>", text)
     if match:
         headline_string, n = re.subn(r"\\\w", "", match.group())
         lines = re.split("<br>\d\.\s", headline_string)
-        headlines = lines[1:]  ## first part is 'address shown...'
-        headlines = [h.replace("</p>","").replace("\\","") for h in headlines]
+        headlines = lines[1:]  ## first part is 'above...'
+        headlines = [h.replace("</p>","").replace("\\","").replace("&nbsp;","")
+                     for h in headlines]
         return headlines
     return
 
