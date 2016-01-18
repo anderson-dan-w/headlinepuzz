@@ -8,5 +8,9 @@ exclude_lines =
     ## re-enable standard pragme
     pragma: no cover
 
-    ## ignore __name__ since not runnabel
+    ## ignore __name__ since not runnable
     if __name__ == .__main__.:
+
+    ## ignore representational functions
+    def __str__
+    def __repr__
