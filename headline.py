@@ -1,90 +1,50 @@
 #!/usr/bin/python
-
-## python modules
 import collections
 
-## dwanderson modules
-import dwanderson
-import word as W
-
-ALPHABET = W.ALPHABET
+from . import word as W
+from .alphabetSubstitution import AlphabetSubstitution
 
 ##############################################################################
 class Headline(object):
-    def __init__(self, string, quick=None):
-        self.real_cipher = string.upper()
-        self.cipher = "".join(l for l in self.real_cipher
-                if l.isalpha() or l.isspace())
-        self.word_list = self.cipher.split(" ")
-        self.nwords = len(self.word_list)
-        self.words = {w : W.Word(w, quick=quick) for w in self.word_list}
-        self.loop_strings = []
-        self.mapping = collections.defaultdict(lambda:"?")
+    def __init__(self, headline_str):
+        self.mapping = AlphabetSubstitution()
+        self.words = [W.Word(w, self.mapping) for w in headline_str.split()]
 
-    ##======================================================================##
-    def _get_plain(self):
-        return " ".join(self.words[w].get_plain() for w in self.word_list)
+    @property
+    def plain(self):
+        return " ".join(w.plain for w in self.words)
+
+    @property
+    def cipher(self):
+        return " ".join(w.word for w in self.words)
 
     def __str__(self):
-        string = ""
-        width, _h = dwanderson.get_terminal_size()
-        plain = self._get_plain()
-        for lines in range((len(self.cipher) + width - 1) // width):
-            start, stop = width * lines, width * lines + width
-            string += self.cipher[start:stop] + "\n"
-            string += plain[start:stop] + "\n\n"
-        return string[:-2] ## chop off the last two newlines
+        return "{}\n{}".format(self.cipher, self.plain)
 
-    ##======================================================================##
-    def update_possibles(self):
-        for word in self.words.values():
-            word.mapping = self.mapping
-            word.set_possibles()
-        return
+    @property
+    def is_fully_set(self):
+        return all(w.is_fully_set for w in self.words)
 
-    def get_possibles_for(self, value=None):
-        if isinstance(value, str) and value.upper() in self.word_list:
-            return value.upper(), self.words[value.upper()].possibles
-        if not isinstance(value, (int, type(None))):
-            return "{} not found...".format(value)
-        words = sorted(self.words.values(), key=lambda x:len(x.possibles))
-        if isinstance(value, int):
-            n = self.nwords
-            if value < -1*n or value >= n:
-                return "Pick value between [{},{})".format(-1*n, n)
-            word = words[value]
-            return word.word, word.possibles
-        ## value=None, get first non-filled-in word
-        for word in words:
-            if word.is_fully_set():
-                continue
-            return word.word, word.possibles
-        return "[Everything is set...]"
-
-    ##======================================================================##
-    def set_letters(self, cipher, plain, update=True):
-        cipher, plain = cipher.upper(), plain.upper()
+    def set_letters(self, cipher, plain):
         self.mapping.update(dict(zip(cipher, plain)))
-        if update:
-            self.update_possibles()
-        return
 
-    def unset_letters(self, cipher, update=True):
-        for lett in cipher.upper():
-            try:
-                self.mapping.pop(lett)
-            except KeyError as e:
-                pass
-        if update:
-            self.update_possibles()
-        return
+    def unset_cipher(self, cipher=None):
+        if cipher is None:
+            self.mapping.clear()
+            return
+        for letter in cipher:
+            self.mapping.pop(letter, None)
 
-    def unset_all(self, update=True):
-        self.mapping = collections.defaultdict(lambda:"?")
-        if update:
-            self.update_possibles()
-        return
+    def unset_plain(self, plain_letters):
+        ## can't remove from mapping while iterating over it; two step process:
+        to_remove = {c for c, p in self.mapping.items() if p in plain_letters}
+        for cipher in to_remove:
+            self.mapping.pop(cipher, None)
 
-    ##======================================================================##
-    def get_score(self):
-        pass
+    @property
+    def next_likeliest(self):
+        by_npossible = sorted(self.words, key=lambda w:len(w.possibles))
+        for word in by_npossible:
+            if not word.is_fully_set and word.possibles:
+                return word
+        return None
