@@ -15,6 +15,7 @@ for fname in TEXT_FNAMES:
     text = [w.upper() for w in text.split() if w.isalpha()]
     text_words.extend(text)
 
+
 class Frequency(object):
     def __init__(self, graph_length, words=None):
         self.graph_length = graph_length
@@ -29,18 +30,18 @@ class Frequency(object):
         ## would otherwise have probability 0
         if self.graph_length > 1:
             shorter_words = [w for w in words if len(w) < self.graph_length]
-            self.shorter = Frequency(self.graph_length-1, shorter_words)
+            self.shorter = Frequency(self.graph_length - 1, shorter_words)
         for word in words:
             if len(word) < self.graph_length:
                 continue
             for i in range(len(word) - self.graph_length + 1):
-                graph = word[i:i+self.graph_length]
+                graph = word[i:i + self.graph_length]
                 self.counts[graph] += 1
         self.ncounts = sum(self.counts.values())
 
     def getGraphProbability(self, graph):
         print("prob {}".format(graph))
-        vs_random = self.ncounts or 1 ## prevent divide-by-zero error
+        vs_random = self.ncounts or 1  ## prevent divide-by-zero error
         dit_smoother = len(ALPHABET) ** graph.count(DIT)
         iterables = [ALPHABET if l == DIT else l for l in graph]
         graph_count = 0
@@ -54,9 +55,9 @@ class Frequency(object):
         graph_prob = self.getGraphProbability(graph)
         if graph_prob == 0.0:
             ## arbitrary - just make it worse than "average"
-            graph_prob = self.getGraphProbability(DIT*self.graph_length) / 2
+            graph_prob = self.getGraphProbability(DIT * self.graph_length) / 2
         normalized = graph_prob * (len(ALPHABET) ** self.graph_length)
-        return math.log(normalized, 2) ## base-2 is arbitrary
+        return math.log(normalized, 2)  ## base-2 is arbitrary
 
     ## named to present consistent interface: all scorers will have .score()
     def score(self, word):
@@ -66,7 +67,7 @@ class Frequency(object):
         ngraphs = len_word - self.graph_length + 1
         cumulative = 0
         for i in range(ngraphs):
-            cumulative += self.getGraphScore(word[i:i+self.graph_length])
+            cumulative += self.getGraphScore(word[i:i + self.graph_length])
         average = cumulative / ngraphs
         return average
 
