@@ -7,7 +7,7 @@ class HeadlineTestCase(unittest.TestCase):
     def setUp(self):
         self.true_plain = "HEADLINE PUZZLES SOMETIMES CONFUSE CRYPTOGRAPHERS"
         ## nb: rot13 for simplicity
-        self.cipher     = "URNQYVAR CHMMYRF FBZRGVZRF PBASHFR PELCGBTENCUREF"
+        self.cipher = "URNQYVAR CHMMYRF FBZRGVZRF PBASHFR PELCGBTENCUREF"
         self.plain = "".join("?" if l.isupper() else l for l in self.cipher)
         self.headline_words = self.cipher.split()
         self.headline = hlpheadline.Headline(self.cipher)
@@ -31,7 +31,7 @@ class HeadlineTestCase(unittest.TestCase):
 
     def test_mapping(self):
         self.headline.set_letters("PEL", "CRY")
-        d = {c: p for c, p in zip("PEL","CRY")}
+        d = {c: p for c, p in zip("PEL", "CRY")}
         self.assertDictEqual(d, self.headline.mapping)
         self.headline.unset_cipher("P")
         self.assertNotIn("P", self.headline.mapping)
