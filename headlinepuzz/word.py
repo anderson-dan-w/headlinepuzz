@@ -5,8 +5,8 @@ import sys
 import json
 import string
 
-from .hlpConstants import HLPDIR, DICT_FNAMES, PATTERNS_FNAME
-from .alphabetSubstitution import ALPHABET, DIT, AlphabetSubstitution
+from headlinepuzz.hlpConstants import HLPDIR, DICT_FNAMES, PATTERNS_FNAME
+from headlinepuzz.alphabetSubstitution import ALPHABET, DIT, AlphabetSubstitution
 
 class PatternMapper():
     ALPHABET = ALPHABET

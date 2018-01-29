@@ -47,5 +47,4 @@ class HeadlineTestCase(unittest.TestCase):
         for plain, word in zip(self.true_plain.split(" "), self.headline.words):
             print("{}: {}".format(word, word.possibles))
             word.plain = plain
-        self.assertTrue(False)
         self.assertTrue(self.headline.is_fully_set)

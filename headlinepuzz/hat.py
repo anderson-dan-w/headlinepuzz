@@ -4,7 +4,7 @@ import json
 import string
 import os
 
-from .hlpConstants import HLPDIR, DICT_FNAMES, NUMERICALS_FNAME
+from headlinepuzz.hlpConstants import HLPDIR, DICT_FNAMES, NUMERICALS_FNAME
 
 class Hat(object):
     ALPHABET = string.ascii_uppercase

@@ -3,8 +3,8 @@ import collections
 import itertools
 import math
 
-from .hlpConstants import TEXT_FNAMES
-from .alphabetSubstitution import ALPHABET, DIT
+from headlinepuzz.hlpConstants import TEXT_FNAMES
+from headlinepuzz.alphabetSubstitution import ALPHABET, DIT
 
 ## text_words and text should NOT be set()s, because they help determine
 ## n-graph frequency, so we want to know which ones show up more frequently

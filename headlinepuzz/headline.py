@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import collections
 
-from . import word as W
-from .alphabetSubstitution import AlphabetSubstitution
+from headlinepuzz import word as W
+from headlinepuzz.alphabetSubstitution import AlphabetSubstitution
 
 ##############################################################################
 class Headline(object):
